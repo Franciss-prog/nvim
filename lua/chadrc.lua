@@ -7,56 +7,18 @@ local M = {}
 
 M.base46 = {
   theme = "chadwal",
-  transparency = true,
   hl_override = {
     Comment = { italic = true },
     ["@comment"] = { italic = true },
   },
-}
-
-M.plugins = {
-  override_options = {
-    ["neovim/nvim-lspconfig"] = {
-      servers = {
-        tailwindcss = {
-          filetypes = {
-            "html",
-            "css",
-            "scss",
-            "javascript",
-            "javascriptreact",
-            "typescript",
-            "typescriptreact",
-            "vue",
-            "svelte",
-          },
-          settings = {
-            tailwindCSS = {
-              experimental = {
-                classRegex = {
-                  "tw\\([^)]*\\)", -- Support for `tw()` syntax if used
-                  'className="([^"]*)"', -- Match className attributes
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-    user = {
-      {
-        "roobert/tailwindcss-colorizer-cmp.nvim",
-        config = true,
-      },
-    },
-  },
+  transparency = true,
 }
 
 M.nvdash = { load_on_startup = true }
--- M.ui = {
---   tabufline = {
---     lazyload = false
---   }
--- }
+M.ui = {
+  tabufline = {
+    lazyload = false,
+  },
+}
 
 return M

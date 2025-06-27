@@ -10,10 +10,22 @@ local options = {
     json = { "prettier" },
     markdown = { "prettier" },
     yaml = { "prettier" },
-    svelte = { "prettierd" }, -- ✅ Add this
+    svelte = { "prettierd" },
+    python = { "black" }, -- Switched to black for Python formatting
+  },
+  formatters = {
+    black = {
+      command = "black",
+      args = {
+        "--line-length=88",
+        "--skip-string-normalization",
+        "--fast",
+        "$FILENAME",
+      },
+      stdin = false,
+    },
   },
   format_on_save = {
-    -- These options will be passed to conform.format()
     timeout_ms = 500,
     lsp_fallback = true,
   },

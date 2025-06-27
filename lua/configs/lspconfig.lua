@@ -1,4 +1,3 @@
--- File: ~/.config/nvim/lua/configs/lspconfig.lua
 local lspconfig = require "lspconfig"
 local nvchad_config = require "nvchad.configs.lspconfig"
 
@@ -7,7 +6,7 @@ nvchad_config.defaults()
 
 local servers = {
   "html",
-  "ts_ls",
+  "ts_ls", -- Use ts_ls instead of tsserver
   "eslint",
   "pyright",
   "rust_analyzer",
@@ -27,8 +26,8 @@ for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup {
     on_attach = nvchad_config.on_attach,
     capabilities = nvchad_config.capabilities,
-    -- Add tsserver-specific settings
-    settings = lsp == "tsserver" and {
+    -- Add ts_ls-specific settings
+    settings = lsp == "ts_ls" and {
       typescript = {
         inlayHints = {
           includeInlayParameterNameHints = "all",
@@ -51,12 +50,12 @@ for _, lsp in ipairs(servers) do
           includeInlayEnumMemberValueHints = true,
         },
       },
-    } or nil,
+    } or {},
   }
 end
 
--- Explicit tsserver setup for TypeScript and SvelteKit
-lspconfig.tsserver.setup {
+-- Explicit ts_ls setup for TypeScript and SvelteKit
+lspconfig.ts_ls.setup {
   on_attach = nvchad_config.on_attach,
   capabilities = nvchad_config.capabilities,
   filetypes = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
