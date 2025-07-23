@@ -6,6 +6,7 @@ nvchad_config.defaults()
 
 local servers = {
   "html",
+  "cssls",
   "ts_ls", -- Use ts_ls instead of tsserver
   "eslint",
   "pyright",

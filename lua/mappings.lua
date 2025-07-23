@@ -15,9 +15,11 @@ map("n", "<CR>", "i", { desc = "insert mode with Enter" })
 
 local nomap = vim.keymap.del
 nomap("n", "<leader>x")
+nomap("n", "<tab>")
 map("n", "<leader>w", function()
   require("nvchad.tabufline").close_buffer()
 end, { desc = "buffer close" })
 
 map("n", "<leader>e", "<cmd>NvimTreeToggle<CR>", { desc = "nvimtree toggle window" })
 map({ "n", "i", "v" }, "<C-s>", "<cmd> w <cr>")
+map("n", "<leader>q", "<cmd>Telescope buffers<CR>", { desc = "List buffers" })

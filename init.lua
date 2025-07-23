@@ -35,13 +35,13 @@ require "autocmds"
 vim.schedule(function()
   require "mappings"
 end)
-os.execute "python ~/.config/nvim/pywal/chadwal.py &> /dev/null &"
+os.execute("python ~/.config/nvim/pywal/chadwal.py &> /dev/null &")
 
 local autocmd = vim.api.nvim_create_autocmd
 
 autocmd("Signal", {
   pattern = "SIGUSR1",
   callback = function()
-    require("nvchad.utils").reload()
-  end,
+    require('nvchad.utils').reload()
+  end
 })
