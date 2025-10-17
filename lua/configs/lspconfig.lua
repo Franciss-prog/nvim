@@ -1,48 +1,55 @@
-local lspconfig = require "lspconfig"
+-- Load NvChad's defaults
 local nvchad_config = require "nvchad.configs.lspconfig"
-
--- Apply NvChad's default on_attach and capabilities
 local on_attach = nvchad_config.on_attach
 local capabilities = nvchad_config.capabilities
 
--- Servers that don’t need extra customization
-local servers = {
-  "html",
-  "cssls",
-  "eslint",
-  "pyright",
-  "rust_analyzer",
-  "clangd",
-  "lua_ls",
-  "gopls",
-  "jsonls",
-  "yamlls",
-  "bashls",
-  "dockerls",
-  "tailwindcss",
-  "jdtls",
-  "intelephense",
-}
-
--- Set up generic servers
-for _, lsp in ipairs(servers) do
-  lspconfig[lsp].setup {
-    on_attach = on_attach,
-    capabilities = capabilities,
-  }
+-- Utility to set up a server only when its filetype is opened
+local function setup_lsp(name, opts)
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = opts.filetypes or name,
+    callback = function()
+      if not vim.lsp.get_clients({ name = name })[1] then
+        vim.lsp.config[name] = vim.tbl_deep_extend("force", {
+          on_attach = on_attach,
+          capabilities = capabilities,
+        }, opts)
+        vim.lsp.start(vim.lsp.config[name])
+      end
+    end,
+  })
 end
 
--- TypeScript / JavaScript LSP
-lspconfig.ts_ls.setup {
-  on_attach = on_attach,
-  capabilities = capabilities,
+-- HTML, CSS, JSON, YAML, Bash, Docker, etc.
+local generic_servers = {
+  html = { filetypes = { "html" } },
+  cssls = { filetypes = { "css", "scss", "less" } },
+  eslint = { filetypes = { "javascript", "typescript", "javascriptreact", "typescriptreact" } },
+  pyright = { filetypes = { "python" } },
+  rust_analyzer = { filetypes = { "rust" } },
+  clangd = { filetypes = { "c", "cpp", "objc", "objcpp" } },
+  lua_ls = { filetypes = { "lua" } },
+  gopls = { filetypes = { "go" } },
+  jsonls = { filetypes = { "json" } },
+  yamlls = { filetypes = { "yaml", "yml" } },
+  bashls = { filetypes = { "sh", "bash" } },
+  dockerls = { filetypes = { "Dockerfile", "dockerfile" } },
+  tailwindcss = { filetypes = { "html", "css", "javascriptreact", "typescriptreact", "svelte" } },
+  jdtls = { filetypes = { "java" } },
+  intelephense = { filetypes = { "php" } },
+}
+
+for name, opts in pairs(generic_servers) do
+  setup_lsp(name, opts)
+end
+
+-- TypeScript / JavaScript
+setup_lsp("ts_ls", {
   filetypes = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
-  root_dir = lspconfig.util.root_pattern("package.json", "tsconfig.json", "jsconfig.json", ".git"),
+  root_dir = vim.fs.root(0, { "package.json", "tsconfig.json", "jsconfig.json", ".git" }),
   settings = {
     typescript = {
       inlayHints = {
         includeInlayParameterNameHints = "all",
-        includeInlayParameterNameHintsWhenArgumentMatchesName = false,
         includeInlayFunctionParameterTypeHints = true,
         includeInlayVariableTypeHints = true,
         includeInlayPropertyDeclarationTypeHints = true,
@@ -53,7 +60,6 @@ lspconfig.ts_ls.setup {
     javascript = {
       inlayHints = {
         includeInlayParameterNameHints = "all",
-        includeInlayParameterNameHintsWhenArgumentMatchesName = false,
         includeInlayFunctionParameterTypeHints = true,
         includeInlayVariableTypeHints = true,
         includeInlayPropertyDeclarationTypeHints = true,
@@ -62,42 +68,31 @@ lspconfig.ts_ls.setup {
       },
     },
   },
-}
+})
 
--- Svelte LSP
-lspconfig.svelte.setup {
-  cmd = { "svelteserver", "--stdio" }, -- or adjust to your node_modules path
-  on_attach = on_attach,
-  capabilities = capabilities,
+-- Svelte
+setup_lsp("svelte", {
+  cmd = { "svelteserver", "--stdio" },
   filetypes = { "svelte" },
-  root_dir = lspconfig.util.root_pattern("package.json", ".git"),
-}
+  root_dir = vim.fs.root(0, { "package.json", ".git" }),
+})
 
--- Astro LSP
-lspconfig.astro.setup {
+-- Astro
+setup_lsp("astro", {
   cmd = { "astro-ls", "--stdio" },
-  on_attach = on_attach,
-  capabilities = capabilities,
   filetypes = { "astro" },
-  root_dir = lspconfig.util.root_pattern("package.json", ".git"),
+  root_dir = vim.fs.root(0, { "package.json", ".git" }),
   init_options = {
-    typescript = {
-      tsdk = "/usr/lib/node_modules/typescript/lib", -- adjust if needed
-    },
+    typescript = { tsdk = "/usr/lib/node_modules/typescript/lib" },
   },
-}
+})
 
--- PHP LSP
-lspconfig.intelephense.setup {
-  on_attach = on_attach,
-  capabilities = capabilities,
-  cmd = { "intelephense", "--stdio" }, -- make sure this path works
-  root_dir = lspconfig.util.root_pattern("composer.json", ".git"),
+-- PHP (intelephense)
+setup_lsp("intelephense", {
+  cmd = { "intelephense", "--stdio" },
+  filetypes = { "php" },
+  root_dir = vim.fs.root(0, { "composer.json", ".git" }),
   settings = {
-    intelephense = {
-      files = {
-        maxSize = 5000000,
-      },
-    },
+    intelephense = { files = { maxSize = 5000000 } },
   },
-}
+})
