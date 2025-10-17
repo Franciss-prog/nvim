@@ -14,8 +14,6 @@ map("n", "z", "u", { desc = "undo" })
 map("n", "<CR>", "i", { desc = "insert mode with Enter" })
 
 local nomap = vim.keymap.del
-nomap("n", "<leader>x")
-nomap("n", "<tab>") -- remove normal-mode tab
 
 map("n", "<leader>e", "<cmd>NvimTreeToggle<CR>", { desc = "nvimtree toggle window" })
 map("n", "<leader>q", "<cmd>Telescope buffers<CR>", { desc = "List buffers" })

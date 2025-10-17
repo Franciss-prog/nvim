@@ -45,3 +45,40 @@ autocmd("Signal", {
     require("nvchad.utils").reload()
   end,
 })
+
+-- Diagnostic config (runs at startup, no matter what)
+vim.diagnostic.config {
+  virtual_text = {
+    prefix = "●",
+    spacing = 2,
+  },
+  float = {
+    border = "rounded",
+    source = "always",
+  },
+  severity_sort = true,
+}
+
+-- Ensure it reapplies when LSP attaches (prevents overrides)
+vim.api.nvim_create_autocmd("LspAttach", {
+  callback = function()
+    vim.diagnostic.config {
+      virtual_text = { prefix = "●" },
+      float = { border = "rounded", source = "always" },
+      severity_sort = true,
+    }
+  end,
+})
+
+-- Auto popup diagnostics on hover
+vim.o.updatetime = 250
+vim.api.nvim_create_autocmd("CursorHold", {
+  callback = function()
+    vim.diagnostic.open_float(nil, {
+      focusable = false,
+      border = "rounded",
+      source = "always",
+      prefix = "",
+    })
+  end,
+})

@@ -92,6 +92,9 @@ return {
           resize_window = true,
         },
       },
+      filters = {
+        dotfiles = false, -- show .env and other hidden files
+      },
     },
   },
   {
@@ -124,5 +127,49 @@ return {
         },
       },
     },
+  },
+  {
+    "rafamadriz/friendly-snippets",
+    config = function()
+      -- Load VSCode-style snippets (React, Next.js, etc.)
+      require("luasnip.loaders.from_vscode").lazy_load()
+    end,
+  },
+  -- add this to the file where you setup your other plugins:
+  {
+    "monkoose/neocodeium",
+    event = "VeryLazy",
+    config = function()
+      local neocodeium = require "neocodeium"
+      neocodeium.setup()
+      vim.keymap.set("i", "<A-f>", neocodeium.accept)
+    end,
+  },
+  {
+    "nvim-telescope/telescope.nvim",
+    opts = function(_, opts)
+      local actions = require "telescope.actions"
+      local action_state = require "telescope.actions.state"
+
+      opts = opts or {}
+      opts.defaults = vim.tbl_deep_extend("force", opts.defaults or {}, {
+        mappings = {
+          i = {
+            ["<C-c>"] = function(prompt_bufnr)
+              local entry = action_state.get_selected_entry()
+              if entry and entry.value then
+                vim.fn.setreg("+", entry.value)
+                print("Copied: " .. entry.value)
+              else
+                print "No entry selected"
+              end
+            end,
+            ["<C-q>"] = actions.smart_send_to_qflist + actions.open_qflist,
+          },
+        },
+      })
+
+      return opts
+    end,
   },
 }
